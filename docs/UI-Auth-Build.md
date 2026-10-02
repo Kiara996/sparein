@@ -4,6 +4,8 @@ Lembar kerja buat ngegambar halaman autentikasi Sparein di Figma: **Masuk (P01)*
 
 Tinggal ikutin urutan dari atas ke bawah. Semua angka dalam piksel (px).
 
+Mau liat contoh jadinya? Ada mockup SVG delapan frame auth di [`design/auth/`](design/README.md). Tinggal drag ke Figma buat jadi patokan visual. Komponen dan auto layout-nya tetap dibangun manual, SVG ngga bawa itu.
+
 ## Daftar isi
 
 1. [Yang bakal digambar](#1-yang-bakal-digambar)
@@ -428,7 +430,7 @@ Kalau mau lebih lengkap, di page `99 Arsip` boleh bikin variasi error lain buat 
 |---|---|
 | `Link Mode` | "Sudah punya akun? " (Small, blue/200) + "MASUK" (Small/Strong, white) |
 | Judul | Bikin akun Sparein |
-| Subjudul | Gratis. Buka langkah panduan lengkap, harga suku cadang, dan jurnal perbaikan. (jadi tiga baris karena lebih sempit) |
+| Subjudul | Gratis. Buka langkah panduan lengkap, harga suku cadang, dan jurnal perbaikan. (jadi dua baris karena lebih sempit) |
 | Field, tombol, teks bawah | Sama kayak desktop 5.1 |
 
 `Banner` dan `Logo` ngga berubah dari login. Yang beda cuma isi `Sheet`.
