@@ -85,6 +85,27 @@ Tiap halaman di [bagian 7](#7-spesifikasi-per-halaman) struktur isinya sama:
 
 Biar rapi kita pakai kode halaman dengan format `P-x-x`. x pertama buat nomor modul. x kedua buat nomor halaman (contoh P01 berarti halaman pertama di modul 0, P12 berarti halaman kedua di modul 1). Kode komponen pakai format `C-x-x`.
 
+### 1.4 Status kode di `dev` (per 2 Okt 2026)
+
+Sebelum desain dikerjain, cek dulu apa yang udah ada di kode biar ngga bikin desain yang bentrok sama yang udah jalan. Sampai sekarang baru `core` dan `devices` (M1) yang ada kodenya, dan semua tampilannya masih HTML polos tanpa CSS, belum ada Tailwind. Jadi desain Figma ini tetap jadi target tampilannya, dan kode yang nanti menyesuaikan.
+
+| Halaman | Di kode | Catatan |
+|---|---|---|
+| P00 Beranda | Ada, isinya cuma judul dan satu kalimat | Semua section di spec belum ada |
+| P01 Masuk | Ada, pakai login bawaan Django di `/accounts/login/` | Form masih `form.as_p`, link "Belum punya akun?" belum bawa `next` |
+| P02 Daftar | Ada di `/register/` | Pakai `UserCreationForm` bawaan, jadi cuma username dan dua kolom password. Ngga ada email. Setelah daftar selalu ke beranda |
+| P03 Profil Saya | Belum ada | Rute dan template belum dibikin |
+| P04, P05 | Belum ada | Sekarang masih halaman error bawaan Django |
+| P10 Katalog | Ada, filter AJAX udah jalan | Kategori masih Select satu pilihan, merek masih input teks, hasil maksimal 60 tanpa pagination |
+| P11 Detail Perangkat | Ada | Section gejala, panduan, dan suku cadang belum ada karena modulnya belum dibikin |
+| P12 Form Perangkat | Ada | Pakai `form.as_p` |
+| Hapus perangkat | Ada, berupa halaman konfirmasi sendiri | Belum berupa modal, lihat Q22 |
+| P20 sampai P52 | Belum ada | Modul M2 sampai M5 belum mulai |
+
+Komponen yang udah ada di `core/templates/partials/`: `header.html`, `footer.html`, `card.html`, dan `empty_state.html`. Header sekarang isinya cuma Perangkat, Masuk, Daftar, dan tombol Keluar. Tombol Keluar itu form POST, jadi di desain item "Keluar" di Account Menu tetap harus dianggap tombol submit, bukan link biasa.
+
+Akses halaman di kode udah sesuai matriks bagian 8 buat M1: Visitor yang buka form langsung dilempar ke login, Member kena 403, Contributor cuma bisa ubah perangkat buatannya sendiri, dan cuma Admin yang bisa hapus.
+
 ---
 
 ## 2. Aturan main di Figma
@@ -620,7 +641,7 @@ Dropdown dari avatar di header. Lebar 240, latar putih, garis `blue/200`, radius
 
 | Item | Muncul buat |
 |---|---|
-| Nama + email + Badge Role (bukan tombol, cuma info) | Semua yang login |
+| Username + Badge Role (bukan tombol, cuma info) | Semua yang login |
 | Profil Saya | Semua yang login |
 | Jurnal Saya | Semua yang login |
 | Panduan Tersimpan | Semua yang login |
@@ -783,7 +804,7 @@ Total ada **22 halaman** plus satu modal konfirmasi hapus yang dipakai ulang. Ko
 | Kode | Halaman | URL | Modul | PIC | Akses | Frame minimal |
 |---|---|---|---|---|---|---|
 | P00 | Beranda | `/` | core | Semua | Semua | D+M Visitor, D Member |
-| P01 | Masuk | `/login/` | core | Semua | Belum login | D+M, D error |
+| P01 | Masuk | `/accounts/login/` | core | Semua | Belum login | D+M, D error |
 | P02 | Daftar | `/register/` | core | Semua | Belum login | D+M, D error |
 | P03 | Profil Saya | `/profile/` | core | Semua | Login | D+M Member, D Contributor |
 | P04 | Halaman tidak ditemukan | semua URL salah | core | Semua | Semua | D+M |
@@ -810,7 +831,7 @@ Perkiraan totalnya sekitar **70 frame**. Lumayan banyak tapi sebenernya sebagian
 
 **Kenapa form tambah dan edit cuma satu kode?** Karena tampilannya sama. Bedanya cuma judul ("Tambah perangkat" atau "Edit perangkat"), isian yang sudah terisi, dan tombol "Hapus" yang cuma ada di mode edit. Di Figma cukup gambar mode tambah, lalu satu frame desktop mode edit.
 
-**URL yang belum ada di `MODULES.md`**: `/login/`, `/register/`, `/profile/` (core), dan `/guides/saved/` (M3). Ini usulan baru, nanti harus di cek bareng-bareng.
+**URL yang belum ada di `MODULES.md`**: `/accounts/login/` dan `/register/` (core, dua-duanya udah ada di kode), `/profile/` (core, belum ada), dan `/guides/saved/` (M3, belum ada). Logout lewat `/accounts/logout/` pakai method POST. Dua yang belum ada ini masih usulan, nanti harus di cek bareng-bareng.
 
 ---
 
@@ -910,26 +931,26 @@ flowchart TD
 
 ### 6.3 Alur login dan konten terkunci
 
-Visitor yang mencoba aksi khusus Member dilempar ke halaman Masuk, lalu setelah berhasil dikembalikan ke halaman asal. Di Django ini pakai query param `?next=`.
+Visitor yang mencoba aksi khusus Member dilempar ke halaman Masuk, lalu setelah berhasil masuk dikembalikan ke halaman asal. Di Django ini pakai query param `?next=`. Kalau dia malah daftar dulu, di kode sekarang `next` ngga ikut kebawa, jadi setelah daftar dia mendarat di beranda.
 
 ```mermaid
 flowchart TD
-  A["Visitor klik aksi khusus Member<br/>contoh: Simpan panduan, Catat perbaikan,<br/>atau tombol Masuk di Locked Content"] --> B["P01 Masuk<br/>/login/?next=/guides/ganti-baterai/"]
+  A["Visitor klik aksi khusus Member<br/>contoh: Simpan panduan, Catat perbaikan,<br/>atau tombol Masuk di Locked Content"] --> B["P01 Masuk<br/>/accounts/login/?next=/guides/ganti-baterai/"]
   B --> C{"Username dan<br/>password benar?"}
   C -- salah --> D["P01 dengan pesan error<br/>isian username tetap terisi"]
   D --> C
   C -- benar --> E["Balik ke halaman asal<br/>+ Toast: Selamat datang, username"]
   B --> F["Link: Belum punya akun? Daftar"]
-  F --> G["P02 Daftar<br/>next tetap dibawa"]
+  F --> G["P02 Daftar"]
   G --> H{"Isian valid?"}
   H -- tidak --> I["P02 dengan pesan error per isian"]
   I --> H
   H -- ya --> J["Akun dibuat + langsung login"]
-  J --> E
+  J --> K["P00 Beranda<br/>+ Toast: Akun berhasil dibuat"]
 
   classDef ok fill:#16A34A,stroke:#14532D,color:#fff
   classDef bad fill:#DC2626,stroke:#7F1D1D,color:#fff
-  class E,J ok
+  class E,J,K ok
   class D,I bad
 ```
 
@@ -1205,7 +1226,7 @@ Beberapa rules kerangka html kita:
 
 | | |
 |---|---|
-| URL | `/login/` (boleh ada `?next=`) |
+| URL | `/accounts/login/` (boleh ada `?next=`) |
 | Modul | core |
 | File template | `core/templates/registration/login.html` |
 | Akses | Belum login. Kalau sudah login, langsung dilempar ke beranda. |
@@ -1222,7 +1243,7 @@ Beberapa rules kerangka html kita:
    - Form Field "Username" (Text Input, `autocomplete=username`).
    - Form Field "Password" (Text Input tipe password + Icon Button mata buat lihat atau sembunyikan).
    - Button primary "Masuk" selebar kartu.
-   - Teks tengah: "Belum punya akun? **Daftar**" (link ke P02, `next` ikut dibawa).
+   - Teks tengah: "Belum punya akun? **Daftar**" (link ke P02).
 3. Header tetap tampil biar user bisa kabur ke halaman lain.
 
 **Validasi dan pesan:**
@@ -1231,7 +1252,7 @@ Beberapa rules kerangka html kita:
 |---|---|
 | Username kosong | "Username wajib diisi." |
 | Password kosong | "Password wajib diisi." |
-| Username atau password salah | Kotak error di atas form: "Username atau password salah. Coba cek lagi ya." Username tetap terisi, password dikosongkan. |
+| Username atau password salah | Kotak error di atas form: "Username atau password salah. Coba cek lagi ya." Username tetap terisi, password dikosongkan. Di kode pesannya masih bawaan Django, nanti diganti ke teks ini. |
 
 **Setelah berhasil:** redirect ke `next` atau beranda, lalu Toast info "Selamat datang lagi, username."
 
@@ -1267,7 +1288,7 @@ Beberapa rules kerangka html kita:
 |---|---|
 | URL | `/register/` |
 | Modul | core |
-| File template | `core/templates/registration/register.html` |
+| File template | `core/templates/core/register.html` |
 | Akses | Belum login |
 
 **Tujuan.** Bikin akun Member baru. Semua akun baru otomatis jadi Member.
@@ -1275,12 +1296,11 @@ Beberapa rules kerangka html kita:
 **Isi halaman:** kerangka sama dengan P01, tapi isi kartunya:
 
 1. Logo, judul H1 "Bikin akun Sparein", subjudul `Small` "Gratis. Buka langkah panduan lengkap, harga suku cadang, dan jurnal perbaikan."
-2. Form Field:
+2. Form Field (cuma tiga isian karena kode pakai `UserCreationForm` bawaan Django, jadi email ngga dikumpulin, lihat Q19):
 
 | Label | Tipe | Wajib | Helper text | Validasi |
 |---|---|---|---|---|
 | Username | Text | Ya | "Huruf, angka, dan _ saja. Maks 150 karakter." | Unik, format Django |
-| Email | Text (email) | Ya | kosong | Format email valid |
 | Password | Password | Ya | "Minimal 8 karakter, jangan cuma angka." | Aturan password Django |
 | Ulangi password | Password | Ya | kosong | Harus sama dengan Password |
 
@@ -1292,12 +1312,11 @@ Beberapa rules kerangka html kita:
 | Kondisi | Pesan |
 |---|---|
 | Username sudah dipakai | "Username ini sudah dipakai orang lain." |
-| Email tidak valid | "Format email belum benar." |
 | Password terlalu pendek | "Password minimal 8 karakter." |
 | Password cuma angka | "Password jangan cuma angka." |
 | Password tidak sama | "Password yang kamu ulangi tidak sama." |
 
-**Setelah berhasil** langsung login, redirect ke `next` atau beranda, Toast sukses "Akun berhasil dibuat. Selamat datang di Sparein!"
+**Setelah berhasil** langsung login, redirect ke beranda, Toast sukses "Akun berhasil dibuat. Selamat datang di Sparein!"
 
 **State:** default, error (gambar minimal dua isian yang error sekaligus).
 
@@ -1316,7 +1335,7 @@ Beberapa rules kerangka html kita:
 
 **Isi halaman:**
 
-1. **Kartu identitas**: Avatar 64, username (`Heading/H2`), email (`Small`), Badge Role, "Bergabung sejak 12 Sep 2026" (`Small`).
+1. **Kartu identitas**: Avatar 64, username (`Heading/H2`), Badge Role, "Bergabung sejak 12 Sep 2026" (`Small`).
 2. **Jalan pintas** (grid 2 kolom desktop, 1 kolom mobile), tiap item kartu yang bisa diklik:
    - `notebook-pen` Jurnal Saya: "3 catatan" -> P50
    - `bookmark` Panduan Tersimpan: "5 panduan" -> P33
@@ -1359,10 +1378,10 @@ Isi di tengah halaman berupa ikon `shield-x` 48 `blue/400`, judul H1 "Kamu belum
 
 | | |
 |---|---|
-| URL | `/devices/?q=&category=&brand=&page=` |
+| URL | `/devices/?q=&category=&brand=` (`page=` nyusul kalau pagination jadi dibikin) |
 | Modul | M1 devices |
 | PIC | Muhammad Sultan Zidan |
-| File template | `devices/templates/devices/device_list.html` |
+| File template | `devices/templates/devices/list.html` |
 | Akses | Semua |
 
 **Tujuan.** Tempat mencari dan menyaring semua perangkat. Ini pintu masuk utama ke fitur lain.
@@ -1370,7 +1389,7 @@ Isi di tengah halaman berupa ikon `shield-x` 48 `blue/400`, judul H1 "Kamu belum
 **Isi halaman:**
 
 1. **Page Header**: judul H1 "Katalog Perangkat", deskripsi "Cari model barangmu buat lihat gejala, panduan, dan suku cadangnya." Di kanan: Button primary "+ Tambah perangkat" (Contributor ke atas).
-2. **Search Bar** varian `default` selebar konten, placeholder "Cari nama atau merek perangkat".
+2. **Search Bar** varian `default` selebar konten, placeholder "Cari nama perangkat".
 3. **Area dua kolom** (desktop):
    - **Kiri, Filter Panel (3 kolom):**
      - Kategori: daftar Checkbox, dikelompokkan per kategori induk (induk tebal, anak menjorok 16). Tampil 6 dulu, sisanya di balik link "Lihat semua kategori".
@@ -1399,6 +1418,12 @@ Isi di tengah halaman berupa ikon `shield-x` 48 `blue/400`, judul H1 "Kamu belum
 | Kosong total (belum ada data) | Empty State: "Katalog masih kosong." + (Contributor) Button "Tambah perangkat pertama" |
 | Error AJAX | Toast error "Gagal memuat perangkat. Coba lagi." dan hasil lama tetap tampil |
 
+**Catatan sinkron dengan kode (per 2 Okt 2026):**
+- Pencarian cuma nyocokin nama perangkat, merek ngga ikut dicari, jadi placeholder-nya ditulis "Cari nama perangkat". Filter merek terpisah dan persis sama (huruf besar kecil ngga ngaruh).
+- Kategori di kode masih Select satu pilihan dan merek masih input teks biasa. Desain di atas (checkbox bertingkat dan Select merek) jadi target, kode M1 bisa nyusul. Lihat Q20.
+- Hasil di kode maksimal 60 perangkat dan belum ada pagination. Pagination tetap digambar di desain.
+- `/api/devices/` sekarang ngirim nama, slug, merek, slug kategori, gambar, dan url. Device Card butuh nama kategori dan skor perbaikan, jadi API-nya perlu ditambah. Lihat Q21.
+
 **Mobile:** Filter Panel jadi tombol "Filter" + bottom sheet. Grid jadi 1 kolom (sesuai aturan `DESIGN-SYSTEM.md`). Tombol "+ Tambah perangkat" jadi tombol kecil di bawah judul.
 
 **Wireframe desktop:**
@@ -1410,7 +1435,7 @@ Isi di tengah halaman berupa ikon `shield-x` 48 `blue/400`, judul H1 "Kamu belum
 │ Katalog Perangkat                          [ + Tambah perangkat ]  │
 │ Cari model barangmu buat lihat gejala, panduan, dan suku cadangnya │
 │ ┌────────────────────────────────────────────────────┐ [ Cari ]    │
-│ │ (ikon) Cari nama atau merek perangkat              │             │
+│ │ (ikon) Cari nama perangkat                       │             │
 │ └────────────────────────────────────────────────────┘             │
 │                                                                    │
 │ ┌────────────┐  Menampilkan 24 perangkat                           │
@@ -1439,7 +1464,7 @@ Isi di tengah halaman berupa ikon `shield-x` 48 `blue/400`, judul H1 "Kamu belum
 | URL | `/devices/<slug>/` |
 | Modul | M1 devices |
 | PIC | Muhammad Sultan Zidan |
-| File template | `devices/templates/devices/device_detail.html` |
+| File template | `devices/templates/devices/detail.html` |
 | Akses | Semua |
 
 **Tujuan.** Jadi "rumah" satu perangkat. Dari sini user bisa lanjut ke diagnosa, panduan, atau suku cadang untuk perangkat itu.
@@ -1530,7 +1555,7 @@ Isi di tengah halaman berupa ikon `shield-x` 48 `blue/400`, judul H1 "Kamu belum
 | URL | `/devices/create/` dan `/devices/<slug>/edit/` |
 | Modul | M1 devices |
 | PIC | Muhammad Sultan Zidan |
-| File template | `devices/templates/devices/device_form.html` |
+| File template | `devices/templates/devices/form.html` |
 | Akses | Tambah: Contributor ke atas. Edit: Contributor pembuat atau Admin. |
 
 **Tujuan.** Menambah atau mengubah data perangkat.
@@ -1541,14 +1566,14 @@ Isi di tengah halaman berupa ikon `shield-x` 48 `blue/400`, judul H1 "Kamu belum
 |---|---|---|---|---|
 | Nama perangkat | Text Input | Ya | "Tulis lengkap dengan modelnya, contoh iPhone 11 Pro." | `name` |
 | Kategori | Select (dikelompokkan per induk) | Ya | kosong | `category` |
-| Merek | Text Input | Ya | "Contoh Apple, Samsung, Miyako." | `brand` |
-| Tahun rilis | Text Input angka | Tidak | "4 digit, contoh 2019." | `release_year` |
+| Merek | Text Input | Tidak | "Contoh Apple, Samsung, Miyako." | `brand` |
+| Tahun rilis | Text Input angka | Tidak | "4 digit, antara 1970 sampai tahun depan, contoh 2019." | `release_year` |
 | URL gambar | Text Input | Tidak | "Tempel link gambar. Pratinjau muncul di bawah." | `image_url` |
 | (pratinjau gambar) | Image with Fallback 160x120 | | | |
-| Ringkasan | Textarea, maks 500 | Ya | "Jelaskan singkat perangkat ini." | `summary` |
+| Ringkasan | Textarea | Tidak | "Jelaskan singkat perangkat ini." | `summary` |
 | Skor kemudahan perbaikan | Text Input angka 0 sampai 10 | Tidak | "0 artinya susah banget, 10 artinya gampang banget." | `repairability_score` |
 
-Slug dibikin otomatis dari nama, jadi tidak ada isiannya.
+Slug dibikin otomatis dari nama, jadi tidak ada isiannya. Kalau ada dua perangkat bernama sama, slug yang kedua otomatis dikasih akhiran `-2`, jadi form ngga nolak nama kembar dan ngga perlu pesan error buat itu. Di model, merek dan ringkasan boleh kosong, makanya dua-duanya ngga wajib.
 
 **Tombol di bawah form:** Button secondary "Batal" (balik ke halaman sebelumnya) + Button primary "Simpan perangkat". Di mode edit ada Button Danger Outline "Hapus perangkat" di kiri bawah, cuma buat Admin.
 
@@ -1557,10 +1582,9 @@ Slug dibikin otomatis dari nama, jadi tidak ada isiannya.
 | Kondisi | Pesan |
 |---|---|
 | Wajib tapi kosong | "<Label> wajib diisi." |
-| Tahun di luar akal | "Tahun rilis harus antara 1950 dan tahun ini." |
+| Tahun di luar akal | "Tahun rilis tidak masuk akal." (teks dari kode) |
 | URL tidak valid | "Link gambar belum benar. Pastikan diawali https://" |
 | Skor di luar 0 sampai 10 | "Skor harus di antara 0 dan 10." |
-| Nama sudah ada | "Perangkat dengan nama ini sudah ada." + link ke perangkatnya |
 
 Kalau ada error, form di-scroll ke isian error pertama dan kotak ringkasan error muncul di atas form: "Ada 2 isian yang perlu dibenerin."
 
@@ -2278,7 +2302,9 @@ Satu komponen (C38) dipakai di semua modul. Isi teksnya per konteks:
 | P41, P42 | Hapus suku cadang ini? | "Suku cadang **X** beserta data toko dan kecocokannya akan dihapus." | P40 + Toast |
 | P50, P51 | Hapus catatan ini? | "Catatan **X** akan dihapus. Dampaknya juga ikut dikurangi dari total kamu." | P50 + Toast |
 
-Isi "bisa ikut hilang" di baris perangkat tergantung setting `on_delete` di model. Pastikan teksnya jujur sesuai perilaku sebenarnya.
+Isi "bisa ikut hilang" di baris perangkat tergantung setting `on_delete` di model. Pastikan teksnya jujur sesuai perilaku sebenarnya. Contohnya di kode sekarang kategori perangkat pakai `PROTECT`, tapi `created_by` pakai `SET_NULL`, jadi menghapus user ngga ikut menghapus perangkatnya.
+
+**Catatan sinkron dengan kode:** hapus perangkat di kode sekarang belum berupa modal, tapi halaman konfirmasi sendiri (`devices/confirm_delete.html`, GET nampilin halaman, POST yang beneran ngehapus). Isinya sama persis dengan modal di atas. Kalau modal dirasa kerepotan buat dikoding dulu, gambar satu frame "halaman konfirmasi" dengan isi yang sama biar kode M1 ngga perlu diubah. Lihat Q22.
 
 ---
 
@@ -2439,11 +2465,16 @@ Beberapa hal yang perlu kita bahas kalau sempet, kalau ngga kita ikuti ajah skem
 | Q11 | Visitor boleh lihat gambar langkah panduan? `MODULES.md` cuma mengunci `detail`. | Gambar juga dikunci (cuma judul yang tampil) | P31 | [ ] |
 | Q12 | Link toko (`PartSource.url`) boleh dilihat Visitor? `MODULES.md` cuma mengunci `price` dan `contact`. | Boleh | P41 | [ ] |
 | Q13 | Kontak admin buat minta jadi Contributor lewat apa? Email tim, form Google, atau lainnya? | Belum ada, di desain ditulis "hubungi admin" | P03 | [ ] |
-| Q14 | URL `/login/`, `/register/`, `/profile/`, `/guides/saved/` sudah oke? | Oke | Rute | [ ] |
+| Q14 | URL `/accounts/login/`, `/register/`, `/profile/`, `/guides/saved/` sudah oke? `/accounts/login/` dan `/register/` udah ada di kode | Oke | Rute | [ ] |
 | Q15 | Catatan jurnal wajib isi minimal Panduan atau Perangkat? | Wajib salah satu, biar dampak bisa dihitung | P52 | [ ] |
 | Q16 | Lupa password perlu ada? Butuh pengiriman email, lumayan ribet di PWS. | Tidak ada di versi ini | P01 | [ ] |
 | Q17 | Butuh halaman "Tentang Sparein" yang ada di link footer? | Belum dibikin, link footer diarahkan ke README GitHub | C34 | [ ] |
 | Q18 | Model `SavedGuide` di M3 perlu ditambahkan ke `MODULES.md` beserta endpoint AJAX-nya | Belum ditambahkan | M3 | [ ] |
+| Q19 | Daftar akun perlu isian email? Di kode sekarang cuma username dan password (`UserCreationForm`) | Ngga perlu, ikut kode. Email baru dibutuhin kalau ada fitur lupa password (Q16) | P02, P03 | [ ] |
+| Q20 | Filter katalog perangkat mau dibikin sesuai desain (checkbox kategori bertingkat dan Select merek) atau tetap Select kategori dan input merek kayak di kode? | Tetap seperti kode dulu, desainnya jadi target nanti | P10 | [ ] |
+| Q21 | `/api/devices/` perlu nambah `category_name` dan `repairability_score` biar Device Card bisa nampilin kategori dan skor tanpa query tambahan? | Iya, M1 tambah dua field itu | C20, P10, P20 | [ ] |
+| Q22 | Konfirmasi hapus dibikin modal atau halaman sendiri kayak yang udah ada di kode? | Desain modal, kode boleh halaman konfirmasi dulu | C38, semua halaman hapus | [ ] |
+| Q23 | Halaman 403 dan 404 custom (P04, P05) dibikin di `core/templates/`? | Iya, dua file `403.html` dan `404.html` | P04, P05 | [ ] |
 
 ---
 
