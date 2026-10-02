@@ -301,6 +301,12 @@ core/templates/
 
 Block yang udah ada di `base.html`: `title`, `content`, `extra_js`. Usulan tambahan: `page_header` (buat breadcrumb dan judul) dan `extra_css`. Modul lain tetap cuma ngisi block, bukan ngedit `base.html`.
 
+**Ikon dipanggil dari file, bukan SVG inline.** Jangan nulis `<svg>` langsung di HTML. Simpen ikon sebagai file `.svg` di `core/static/core/icons/`, terus panggil lewat `<img src="{% static 'core/icons/nama.svg' %}" alt="" width="20" height="20">`. Aturannya:
+
+- Warna ikon udah ada di dalam file, jadi namanya ditambah warna: `eye-muted.svg`, `circle-alert-danger.svg`, `info-blue.svg`. Butuh warna lain, bikin file baru.
+- Ikon yang cuma hiasan dikasih `alt=""`. Ikon yang jadi satu-satunya isi tombol, kasih `aria-label` di tombolnya.
+- Ikon yang udah kepake di halaman auth ada di folder yang sama, tinggal dipakai ulang. Sisanya (misal `user`, `bookmark`, `log-out`) bisa diambil dari mockup di `design/base/` atau dari Lucide, lalu disimpen sebagai file.
+
 **Header sticky kaca blur (CSS):**
 
 ```css
