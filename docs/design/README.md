@@ -6,9 +6,9 @@ Mockup visual buat dibuka di Figma, dibikin dari spesifikasi di [`UI-Specs.md`](
 
 | Folder | Isi |
 |---|---|
-| `auth/` | Halaman Masuk (P01) dan Daftar (P02), desktop 1440 dan mobile 390, state default dan error. Total 8 file |
+| `auth/` | Semua 16 frame di `UI-Auth-Build.md`: Masuk (P01, termasuk state dari konten terkunci), Daftar (P02), Akses ditolak (P05), Mobile Menu Visitor, dan Toast. Desktop 1440 dan mobile 390 |
 
-Penamaan file: `<kode halaman>-<nama>-<ukuran>-<state>.svg`, contoh `p01-masuk-desktop-default.svg`.
+Penamaan file: `<kode halaman>-<nama>-<ukuran>-<state>.svg`, contoh `p01-masuk-desktop-default.svg`. Frame pendukung yang bukan halaman namanya `mobile-menu-visitor-mobile.svg` dan `toast-auth-desktop.svg`.
 
 ## Cara import ke Figma
 
