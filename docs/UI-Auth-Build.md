@@ -1,6 +1,6 @@
 # UI Auth Build Sheet
 
-Lembar kerja buat ngegambar halaman autentikasi Sparein di Figma: **Masuk (P01)**, **Daftar (P02)**, **Akses ditolak (P05)**, plus komponen yang dibutuhin dan teks yang tampil di tiap state. Ukuran, warna, dan gaya ngikutin [`UI-Specs.md`](UI-Specs.md) dan [`DESIGN-SYSTEM.md`](DESIGN-SYSTEM.md). Kalau ada yang beda, `UI-Specs.md` yang menang, kecuali di bagian [Catatan penyesuaian](#9-catatan-penyesuaian) yang sengaja nyebutin bedanya.
+Lembar kerja buat ngegambar halaman autentikasi Sparein di Figma: **Masuk (P01)**, **Daftar (P02)**, **Akses ditolak (P05)**, plus komponen yang dibutuhin dan teks yang tampil di tiap state. Masuk dan Daftar pakai layout **split-screen**: ilustrasi di satu sisi, form di sisi lain, dan di desktop dua sisi itu saling geser waktu pindah halaman. Ukuran, warna, dan gaya ngikutin [`UI-Specs.md`](UI-Specs.md) dan [`DESIGN-SYSTEM.md`](DESIGN-SYSTEM.md). Kalau ada yang beda, `UI-Specs.md` yang menang, kecuali di bagian [Catatan penyesuaian](#9-catatan-penyesuaian) yang sengaja nyebutin bedanya.
 
 Tinggal ikutin urutan dari atas ke bawah. Semua angka dalam piksel (px).
 
@@ -36,7 +36,7 @@ Total ada **16 frame**: 8 buat desktop (1440) dan 8 buat mobile (390).
 | 8 | `Mobile Menu / Visitor` | tidak perlu | ada |
 | 9 | `Toast / Auth` (tiga toast dalam satu frame) | ada | tidak perlu |
 
-Nama lengkapnya ditambahin ukuran di tengah, contoh `P01 / Masuk / Desktop / Default`, sesuai aturan penamaan di `UI-Specs.md` bagian 2.3.
+P01 dan P02 pakai layout split-screen tanpa header dan footer (lihat [bagian 4.1](#41-layout-dasar-split-screen-dipake-p01-dan-p02)). Cuma P05 yang masih pakai header dan footer biasa. Nama lengkapnya ditambahin ukuran di tengah, contoh `P01 / Masuk / Desktop / Default`, sesuai aturan penamaan di `UI-Specs.md` bagian 2.3.
 
 Flow-nya cuma gini:
 
@@ -71,8 +71,10 @@ Ini cuma dikerjain sekali kalau file Figma tim belum punya isinya. Kalau udah ad
 1. **Color Styles.** Bikin semua warna dari `UI-Specs.md` bagian 3.1 dengan nama persis (`blue/500`, `success`, `danger`, `ink`, `muted`, `surface`, dan seterusnya), termasuk tiga tint 10%: `danger/tint`, `success/tint`, `muted/tint`. Yang kepake di halaman auth: `blue/50`, `blue/200`, `blue/300`, `blue/400`, `blue/500`, `blue/600`, `blue/700`, `blue/950`, `danger`, `danger/tint`, `success`, `ink`, `muted`, `surface`, `white`.
 2. **Text Styles.** Yang kepake: `Heading/H1` (32/40, 700), `Body` (16/26, 400), `Body/Strong` (16/26, 600), `Small` (14/20, 400), `Small/Strong` (14/20, 600). Font pakai Inter. Di mobile `Heading/H1` jadi 26/34.
 3. **Layout grid.** Desktop: 12 kolom, gutter 24, lebar konten 1120. Mobile: 4 kolom, gutter 16, margin 16.
-4. **Ikon Lucide** (pasang plugin Lucide di Figma). Yang kepake: `circle-alert`, `info`, `check-circle`, `eye`, `eye-off`, `shield-x`, `menu`, `x`, `loader-circle` (buat spinner loading), `chevron-right`.
-5. **Logo.** Import `docs/brand/sparein-icon.svg` (ikon doang) dan `docs/brand/sparein-lockup.svg` (ikon plus tulisan). Versi dark dipake di footer: `sparein-lockup-dark.svg`.
+4. **Ikon Lucide** (pasang plugin Lucide di Figma). Yang kepake: `circle-alert`, `info`, `check-circle`, `eye`, `eye-off`, `shield-x`, `menu`, `x`, `loader-circle` (buat spinner loading), `chevron-right`, `arrow-left`.
+5. **Logo.** Import `docs/brand/sparein-icon.svg` (ikon doang) dan `docs/brand/sparein-lockup.svg` (ikon plus tulisan). Versi dark (`sparein-lockup-dark.svg`) dipake di panel ilustrasi dan di footer.
+6. **Ilustrasi auth.** Import `docs/brand/auth-illustration.svg` (720 x 900, buat panel desktop) dan `docs/brand/auth-illustration-banner.svg` (390 x 240, buat banner mobile). Cukup drag filenya ke Figma, hasilnya vektor jadi tetap tajam. Ilustrasi ini bikinan sendiri pakai palet Sparein, jadi aman dipakai.
+7. **Text Style `Display`** (40/48, 700) juga dipake buat tagline di panel ilustrasi. Style aslinya `blue/700`, tapi di panel gelap warnanya diganti manual ke `white` dan `blue/300` (cukup override warna di layer, ngga usah bikin style baru).
 
 Jarak cuma boleh dari angka ini: `4, 8, 12, 16, 24, 32, 48, 64`. Kalau butuh 20 pilih 16 atau 24, jangan bikin angka sendiri.
 
@@ -187,7 +189,7 @@ Nama: `Link / Inline`. Teks `blue/700`, bergaris bawah, `Body/Strong`. Hover `bl
 
 ### 3.7 Header, Mobile Menu, dan Footer
 
-Cukup versi **Visitor**. Kalau komponen punya teman lain, pake punya dia.
+Cuma dipake di **P05** (halaman Akses ditolak), karena P01 dan P02 pakai layout split-screen tanpa header dan footer. Cukup versi **Visitor**. Kalau komponen punya teman lain, pake punya dia.
 
 | Komponen | Isi |
 |---|---|
@@ -204,107 +206,135 @@ Di halaman auth ngga ada menu yang diberi tanda aktif.
 
 URL kode: `/accounts/login/`. Template: `core/templates/registration/login.html`.
 
-### 4.1 Frame desktop, Default
+### 4.1 Layout dasar split-screen (dipake P01 dan P02)
 
-**Frame:** `P01 / Masuk / Desktop / Default`. Lebar 1440, tinggi minimal 900 (biar footer tetap di bawah, tingginya Hug aja kalau isi lebih panjang).
+Halaman Masuk dan Daftar **ngga pakai header dan footer biasa**. Layarnya dibagi dua panel yang lebarnya sama: panel ilustrasi (gelap) dan panel form (terang). Waktu pindah dari Masuk ke Daftar di desktop, dua panel itu saling tukar posisi, jadi kelihatan kayak geser kanan kiri. Di mobile panelnya ngga tukar posisi, yang berganti cuma isi form-nya.
 
-**Struktur layer (semua auto layout vertikal kecuali disebut lain):**
+| | Masuk (P01) | Daftar (P02) |
+|---|---|---|
+| Panel ilustrasi | di kiri (x = 0) | di kanan (x = 720) |
+| Panel form | di kanan (x = 720) | di kiri (x = 0) |
+
+**Aturan penting buat animasinya:** nama layer `Panel Ilustrasi` dan `Panel Form` harus **persis sama** di frame Masuk dan Daftar. Figma baru ngerti kalau dua layer itu "orang yang sama" kalau namanya sama, dan itu yang bikin Smart Animate ngegeser, bukan ngilangin lalu munculin.
+
+**Struktur layer desktop** (`Panel Ilustrasi` dan `Panel Form` masing-masing 720 x 900, diletakkan bebas tanpa auto layout di level frame supaya posisinya bisa ditukar):
 
 ```
-Frame 1440 x 900, isi surface, gap 0
-├─ Header / Visitor / Desktop           tinggi 64
-├─ Main                                 Fill container, isi surface
-│   padding 64 atas, 64 bawah, align tengah horizontal
-│   └─ Auth Card                        lebar 440, tinggi Hug
-│       isi white, garis 1 blue/200, radius 14
-│       padding 32, gap 24, align tengah
-│       ├─ Heading Group                gap 16, align tengah
-│       │   ├─ Logo ikon 48 x 48
-│       │   └─ Judul "Masuk ke Sparein"   Heading/H1, ink, rata tengah
-│       ├─ Form                         gap 24, lebar Fill
-│       │   ├─ Form / Field  Username
-│       │   ├─ Form / Field  Password
-│       │   └─ Button / Primary  "Masuk"  md, fullWidth
-│       └─ Teks bawah                   Body, muted, rata tengah
-│           "Belum punya akun? " + Link / Inline "Daftar"
-└─ Footer / Desktop
+Frame 1440 x 900, isi white
+├─ Panel Ilustrasi                     720 x 900, clip content
+│   ├─ Gambar                          docs/brand/auth-illustration.svg, 720 x 900
+│   ├─ Logo                            sparein-lockup-dark.svg, tinggi 32, x 64, y 48
+│   └─ Tagline                         vertikal, gap 8, nempel kiri bawah (x 64, jarak 64 dari bawah)
+│       ├─ Baris 1                     Display 40/48, warna white
+│       ├─ Baris 2                     Display 40/48, warna blue/300
+│       └─ Motto                       Small, warna blue/200, "Repair first, discard last."
+└─ Panel Form                          720 x 900, isi white
+    ├─ Link Kembali                    x 64, y 48, "Kembali ke beranda" + ikon arrow-left 16
+    └─ Form Wrap                       lebar 400, vertikal, gap 24, di tengah panel (horizontal dan vertikal)
+        ├─ Heading Group               vertikal, gap 8, rata kiri
+        │   ├─ Judul                   Heading/H1, ink
+        │   └─ Subjudul                Small, muted (cuma ada di Daftar)
+        ├─ Card / Info                 opsional (state tertentu), lebar Fill
+        ├─ Form                        vertikal, gap 24, lebar Fill
+        │   ├─ Form / Field ...
+        │   └─ Button / Primary        md, fullWidth
+        └─ Teks bawah                  Body, muted, rata kiri
 ```
 
-Tinggi kartu kira-kira 470. Ngga usah dikasih tinggi tetap, biarin auto layout yang ngatur.
+Catatan gambarnya:
+- `Gambar` pakai file `docs/brand/auth-illustration.svg` (drag aja filenya ke Figma). Atur `Fill` biar nutup panel penuh, jangan di-stretch.
+- Bagian bawah ilustrasi udah dikasih gradasi gelap, jadi teks Tagline tetap kebaca jelas.
+- `Link Kembali` pakai `Small/Strong`, warna `muted`, hover `ink`.
 
-**Isi tiap field:**
+### 4.2 Frame desktop, Default
 
-| Field | Label | Wajib | Type | Placeholder | Helper |
-|---|---|---|---|---|---|
-| Username | Username | ya | text | kosong | tidak ada |
-| Password | Password | ya | password | kosong | tidak ada |
+**Frame:** `P01 / Masuk / Desktop / Default`. Lebar 1440, tinggi 900. Ikutin struktur di 4.1, posisi panel ilustrasi di kiri.
 
-Kedua field `state = default`, `message = none`.
+**Isi Tagline:**
+
+| Elemen | Teks |
+|---|---|
+| Baris 1 | Masuk dan lanjutin |
+| Baris 2 | perbaikanmu. |
+| Motto | Repair first, discard last. |
+
+**Isi Form Wrap:**
+
+| Elemen | Isi |
+|---|---|
+| Judul | Masuk ke Sparein |
+| Subjudul | tidak ada |
+| Field Username | label "Username", wajib, type text, ngga ada helper |
+| Field Password | label "Password", wajib, type password, ngga ada helper |
+| Tombol | `Button / Primary` md fullWidth "Masuk" |
+| Teks bawah | Belum punya akun? `Link / Inline` "Daftar" |
+
+Dua field `state = default`, `message = none`. Tinggi Form Wrap kira-kira 350, ngga usah dikunci, biarin auto layout.
 
 **Wireframe:**
 
 ```
-┌────────────────────────────────────────────────────────────────────┐
-│ [Sparein]  Perangkat  Diagnosa  Panduan  Suku Cadang  [Masuk][Daftar]
-├────────────────────────────────────────────────────────────────────┤
-│                         (latar surface)                            │
-│                  ┌──────────────────────────┐                      │
-│                  │          (logo)          │                      │
-│                  │     Masuk ke Sparein     │                      │
-│                  │                          │                      │
-│                  │ Username *               │                      │
-│                  │ [                      ] │                      │
-│                  │ Password *               │                      │
-│                  │ [                  (o) ] │                      │
-│                  │                          │                      │
-│                  │ [        Masuk         ] │                      │
-│                  │                          │                      │
-│                  │ Belum punya akun? Daftar │                      │
-│                  └──────────────────────────┘                      │
-├────────────────────────────────────────────────────────────────────┤
-│ Footer                                                             │
-└────────────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────┬──────────────────────────────────┐
+│ [Sparein]                        │ < Kembali ke beranda             │
+│ (gelap, ilustrasi ponsel +       │                                  │
+│  kunci inggris + roda gigi)      │   Masuk ke Sparein               │
+│                                  │                                  │
+│                                  │   Username *                     │
+│                                  │   [                            ] │
+│                                  │   Password *                     │
+│                                  │   [                        (o) ] │
+│                                  │                                  │
+│                                  │   [          Masuk           ]   │
+│                                  │                                  │
+│ Masuk dan lanjutin               │   Belum punya akun? Daftar       │
+│ perbaikanmu.                     │                                  │
+│ Repair first, discard last.      │                                  │
+└──────────────────────────────────┴──────────────────────────────────┘
 ```
 
-### 4.2 Frame desktop, Dari Konten Terkunci
+### 4.3 Frame desktop, Dari Konten Terkunci
 
-**Frame:** `P01 / Masuk / Desktop / Dari Konten Terkunci`. Duplikat frame Default, terus tambahin satu elemen:
+**Frame:** `P01 / Masuk / Desktop / Dari Konten Terkunci`. Duplikat Default, terus tambahin satu elemen di `Form Wrap`, antara `Heading Group` dan `Form`:
 
-- Di dalam `Auth Card`, antara `Heading Group` dan `Form`, taruh `Card / Info` varian `info` dengan teks **"Masuk dulu ya buat lanjut."**
+- `Card / Info` varian `info` dengan teks **"Masuk dulu ya buat lanjut."**
 
-Tinggi kartu nambah kira-kira 64 (jadi sekitar 534). Sisanya sama persis.
+Sisanya sama persis. Frame ini muncul waktu Visitor ngeklik tombol di kotak `Locked Content` (contoh di detail panduan) atau tombol simpan panduan.
 
-Buat nyambungin ke desain lain: frame ini muncul waktu Visitor ngeklik tombol di kotak `Locked Content` (contoh di detail panduan) atau tombol simpan panduan.
-
-### 4.3 Frame desktop, Error
+### 4.4 Frame desktop, Error
 
 **Frame:** `P01 / Masuk / Desktop / Error`. Duplikat Default, terus ubah:
 
 | Elemen | Perubahan |
 |---|---|
 | Antara `Heading Group` dan `Form` | Tambah `Card / Info` varian **error** dengan teks "Username atau password salah. Coba cek lagi ya." |
-| Field Username | Tetap kebuka, `state = filled`, isi contoh `sari_ayu` |
+| Field Username | `state = filled`, isi contoh `sari_ayu` |
 | Field Password | `state = default`, kosong (password dikosongin lagi setelah gagal) |
 
-Tinggi kartu kira-kira 534. Di kode nanti, kotak error muncul sebagai satu pesan di atas form dan bukan di bawah salah satu field. Jadi ngga ada pesan error per field di frame ini.
+Di kode nanti, kotak error muncul sebagai satu pesan di atas form, bukan di bawah salah satu field, jadi ngga ada pesan error per field di frame ini.
 
-### 4.4 Frame mobile
+### 4.5 Frame mobile
 
-**Frame:** `P01 / Masuk / Mobile / Default`, `... / Dari Konten Terkunci`, `... / Error`. Lebar 390, tinggi minimal 844.
+**Frame:** `P01 / Masuk / Mobile / Default`, `... / Dari Konten Terkunci`, `... / Error`. Lebar 390, tinggi 844, isi `blue/950`.
 
-Struktur sama kayak desktop dengan perubahan:
+```
+Frame 390 x 844
+├─ Banner                              390 x 240, clip content
+│   ├─ Gambar                          docs/brand/auth-illustration-banner.svg, 390 x 240
+│   ├─ Logo                            sparein-lockup-dark.svg, tinggi 28, x 16, y 16
+│   └─ Link Mode                       nempel kanan atas (jarak 16 dari kanan, y 20)
+│       "Belum punya akun? " (Small, blue/200) + "DAFTAR" (Small/Strong, white, huruf kapital)
+└─ Sheet                               lebar 390, y 216, tinggi sampai bawah, isi white
+    radius 24 di dua sudut atas, padding 24, vertikal, gap 24
+    ├─ Heading Group                   gap 8
+    │   └─ Judul                       Heading/H1 versi mobile 26/34
+    ├─ Card / Info                     opsional
+    ├─ Form                            gap 24
+    └─ Teks bawah                      Body, muted, rata kiri
+```
 
-| Elemen | Desktop | Mobile |
-|---|---|---|
-| Header | `Header / Visitor / Desktop` (64) | `Header / Visitor / Mobile` (56) |
-| Main padding | 64 atas dan bawah | 32 atas, 48 bawah, 16 kiri kanan |
-| Auth Card lebar | 440 tetap | Fill container (358) |
-| Auth Card garis | 1 `blue/200` | **tanpa garis**, isi tetap `white`, radius 14 |
-| Auth Card padding | 32 | 24 |
-| Judul | `Heading/H1` 32/40 | `Heading/H1` versi mobile 26/34 |
-| Footer | `Footer / Desktop` | `Footer / Mobile` |
+`Sheet` y-nya 216 padahal `Banner` tingginya 240, jadi sheet nutupin 24 piksel bawah banner dan sudut atasnya yang bulat kelihatan nimpa gambar. Isi form sama persis kayak desktop (judul, field, tombol, teks bawah). Tagline dan motto ngga dipakai di mobile. `Link Kembali` juga ngga ada, logo di banner udah jadi link ke beranda.
 
-Tombol Masuk tetap fullWidth. Ukuran target sentuh minimal 44, jadi tinggi tombol dan input jangan dikecilin.
+Tombol dan input tinggi minimal 44, jangan dikecilin.
 
 ---
 
@@ -314,61 +344,57 @@ URL kode: `/register/`. Template: `core/templates/core/register.html`. Isian cum
 
 ### 5.1 Frame desktop, Default
 
-**Frame:** `P02 / Daftar / Desktop / Default`. Kerangkanya sama kayak P01, bedanya di isi `Auth Card`:
+**Frame:** `P02 / Daftar / Desktop / Default`. Struktur layer sama persis kayak P01 di 4.1, bedanya:
 
-```
-Auth Card                               lebar 440, padding 32, gap 24
-├─ Heading Group                        gap 16, align tengah
-│   ├─ Logo ikon 48 x 48
-│   ├─ Judul "Bikin akun Sparein"       Heading/H1, ink, rata tengah
-│   └─ Subjudul                         Small, muted, rata tengah, jarak 8 dari judul
-│       "Gratis. Buka langkah panduan lengkap, harga suku cadang, dan jurnal perbaikan."
-├─ Form                                 gap 24
-│   ├─ Form / Field  Username
-│   ├─ Form / Field  Password
-│   ├─ Form / Field  Ulangi password
-│   └─ Button / Primary  "Daftar"       md, fullWidth
-└─ Teks bawah                           Body, muted, rata tengah
-    "Sudah punya akun? " + Link / Inline "Masuk"
-```
+- Posisi: `Panel Form` di kiri (x = 0), `Panel Ilustrasi` di kanan (x = 720).
+- `Logo` tetap di pojok kiri atas **panel ilustrasinya** (jadi sekarang x-nya 784).
+- `Link Kembali` tetap di pojok kiri atas panel form (x = 64).
 
-Subjudul jaraknya 8 dari judul (bukan 16), jadi taruh judul dan subjudul di satu grup kecil vertikal dengan gap 8, grup itu yang jaraknya 16 dari logo.
+**Isi Tagline:**
 
-**Isi tiap field:**
+| Elemen | Teks |
+|---|---|
+| Baris 1 | Mulai perbaiki |
+| Baris 2 | barangmu sendiri. |
+| Motto | Repair first, discard last. |
 
-| Field | Label | Wajib | Type | Helper |
-|---|---|---|---|---|
-| Username | Username | ya | text | "Maksimal 150 karakter. Boleh huruf, angka, dan @ . + - _" |
-| Password | Password | ya | password | "Minimal 8 karakter, jangan cuma angka, dan jangan terlalu mirip username." |
-| Ulangi password | Ulangi password | ya | password | tidak ada |
+**Isi Form Wrap:**
 
-Ketiganya `state = default`, dua pertama `message = helper`, yang ketiga `message = none`.
+| Elemen | Isi |
+|---|---|
+| Judul | Bikin akun Sparein |
+| Subjudul | Gratis. Buka langkah panduan lengkap, harga suku cadang, dan jurnal perbaikan. |
+| Field Username | label "Username", wajib, type text, helper "Maksimal 150 karakter. Boleh huruf, angka, dan @ . + - _" |
+| Field Password | label "Password", wajib, type password, helper "Minimal 8 karakter, jangan cuma angka, dan jangan terlalu mirip username." |
+| Field Ulangi password | label "Ulangi password", wajib, type password, ngga ada helper |
+| Tombol | `Button / Primary` md fullWidth "Daftar" |
+| Teks bawah | Sudah punya akun? `Link / Inline` "Masuk" |
 
-Tinggi kartu kira-kira 720.
+Dua field pertama `message = helper`, yang ketiga `message = none`. Tinggi Form Wrap kira-kira 600, ngga usah dikunci.
 
 **Wireframe:**
 
 ```
-┌──────────────────────────────────┐
-│             (logo)               │
-│        Bikin akun Sparein        │
-│  Gratis. Buka langkah panduan    │
-│  lengkap, harga suku cadang,     │
-│  dan jurnal perbaikan.           │
-│                                  │
-│ Username *                       │
-│ [                              ] │
-│ Maksimal 150 karakter. Boleh ... │
-│ Password *                       │
-│ [                          (o) ] │
-│ Minimal 8 karakter, jangan ...   │
-│ Ulangi password *                │
-│ [                          (o) ] │
-│                                  │
-│ [           Daftar             ] │
-│                                  │
-│  Sudah punya akun? Masuk         │
-└──────────────────────────────────┘
+┌──────────────────────────────────┬──────────────────────────────────┐
+│ < Kembali ke beranda             │                         [Sparein]│
+│                                  │ (gelap, ilustrasi ponsel +       │
+│   Bikin akun Sparein             │  kunci inggris + roda gigi)      │
+│   Gratis. Buka langkah panduan   │                                  │
+│   lengkap, harga suku cadang...  │                                  │
+│                                  │                                  │
+│   Username *                     │                                  │
+│   [                            ] │                                  │
+│   Maksimal 150 karakter. ...     │                                  │
+│   Password *                     │                                  │
+│   [                        (o) ] │                                  │
+│   Minimal 8 karakter, ...        │                                  │
+│   Ulangi password *              │                                  │
+│   [                        (o) ] │                                  │
+│                                  │                                  │
+│   [          Daftar          ]   │ Mulai perbaiki                   │
+│   Sudah punya akun? Masuk        │ barangmu sendiri.                │
+│                                  │ Repair first, discard last.      │
+└──────────────────────────────────┴──────────────────────────────────┘
 ```
 
 ### 5.2 Frame desktop, Error
@@ -396,7 +422,28 @@ Kalau mau lebih lengkap, di page `99 Arsip` boleh bikin variasi error lain buat 
 
 ### 5.3 Frame mobile
 
-**Frame:** `P02 / Daftar / Mobile / Default` dan `... / Error`. Aturan perubahannya sama kayak P01 mobile di [bagian 4.4](#44-frame-mobile). Subjudul tetap `Small`, cuma jadi tiga baris karena lebih sempit. Tinggi kartu kira-kira 780.
+**Frame:** `P02 / Daftar / Mobile / Default` dan `... / Error`. Strukturnya sama kayak 4.5, bedanya:
+
+| Elemen | Isi |
+|---|---|
+| `Link Mode` | "Sudah punya akun? " (Small, blue/200) + "MASUK" (Small/Strong, white) |
+| Judul | Bikin akun Sparein |
+| Subjudul | Gratis. Buka langkah panduan lengkap, harga suku cadang, dan jurnal perbaikan. (jadi tiga baris karena lebih sempit) |
+| Field, tombol, teks bawah | Sama kayak desktop 5.1 |
+
+`Banner` dan `Logo` ngga berubah dari login. Yang beda cuma isi `Sheet`.
+
+### 5.4 Animasi pindah halaman
+
+| | Desktop | Mobile |
+|---|---|---|
+| Pemicu | klik link "Daftar" di P01 atau "Masuk" di P02 | tap link yang sama (di `Link Mode` atau di teks bawah form) |
+| Tipe | Smart Animate | Smart Animate |
+| Durasi | 500 ms | 300 ms |
+| Easing | Ease in and out | Ease out |
+| Yang bergerak | `Panel Ilustrasi` dan `Panel Form` saling tukar posisi horizontal | isi `Sheet` ganti (judul, field, tombol), banner diam |
+
+Di desktop, isi `Form Wrap` bakal ke-dissolve karena layernya beda antara dua frame. Itu normal dan malah bagus, jadi ngga usah dipaksa.
 
 ---
 
@@ -442,7 +489,7 @@ Halaman Profil (P03) belum digambar. Tombol "Ke profil" tinggal dibikin dulu aja
 
 ### 7.1 Mobile Menu Visitor
 
-**Frame:** `Mobile Menu / Visitor / Mobile`. Lebar 390, tinggi 844. Panel yang muncul dari kanan dan nutupin seluruh layar.
+**Frame:** `Mobile Menu / Visitor / Mobile`. Lebar 390, tinggi 844. Panel yang muncul dari kanan dan nutupin seluruh layar. Dipake dari header di `P05` mobile (P01 dan P02 ngga punya header).
 
 ```
 Panel 390 x 844, isi white
@@ -476,13 +523,15 @@ Dua toast pertama dipake setelah login dan setelah daftar. Yang ketiga cuma cada
 
 ## 8. Sambungan prototype
 
-Pakai mode Prototype di Figma. Semua sambungan "On click", animasi "Instant" biar simpel.
+Pakai mode Prototype di Figma. Semua sambungan "On click". Animasi "Instant" buat sambungan biasa, tapi sambungan **Masuk <-> Daftar** pakai Smart Animate sesuai tabel di [bagian 5.4](#54-animasi-pindah-halaman).
 
 | Dari | Elemen | Ke |
 |---|---|---|
-| Header (semua frame) | Tombol "Masuk" | `P01 / Masuk / Default` |
-| Header (semua frame) | Tombol "Daftar" | `P02 / Daftar / Default` |
-| Header (semua frame) | Logo | frame Beranda (nyusul, dari tim) |
+| Header (frame P05) | Tombol "Masuk" | `P01 / Masuk / Default` |
+| Header (frame P05) | Tombol "Daftar" | `P02 / Daftar / Default` |
+| Header (frame P05) | Logo | frame Beranda (nyusul, dari tim) |
+| Logo di `Panel Ilustrasi` dan `Banner` (P01, P02) | Klik | frame Beranda (nyusul) |
+| `Link Kembali` (P01, P02 desktop) | Klik | frame Beranda (nyusul) |
 | `P01 Default` | Link "Daftar" | `P02 Default` |
 | `P01 Default` | Tombol "Masuk" | `P01 Error` |
 | `P01 Dari Konten Terkunci` | Link "Daftar" | `P02 Default` |
@@ -490,6 +539,7 @@ Pakai mode Prototype di Figma. Semua sambungan "On click", animasi "Instant" bia
 | `P02 Default` | Link "Masuk" | `P01 Default` |
 | `P02 Default` | Tombol "Daftar" | `P02 Error` |
 | `P02 Error` | Link "Masuk" | `P01 Default` |
+| P01 dan P02 mobile | `Link Mode` di banner | frame lawannya (Masuk <-> Daftar), Smart Animate 300 ms |
 | `P05 Member` | Tombol "Ke profil" | nyusul, setelah P03 digambar |
 | `P05 Umum` | Tombol "Ke beranda" | frame Beranda (nyusul) |
 | Mobile (semua) | Icon Button `menu` | `Mobile Menu / Visitor` |
@@ -504,13 +554,15 @@ Login yang berhasil ngga disambungin, karena tujuannya Beranda dan itu digambar 
 
 Beberapa hal di sini sedikit beda dari `UI-Specs.md` atau perlu kamu tahu.
 
-1. **Link pakai `blue/700`, bukan `blue/500`.** `DESIGN-SYSTEM.md` bilang teks kecil di atas putih ngga boleh `blue/500` karena kontrasnya cuma 3.6:1. Teks "Daftar" dan "Masuk" di bawah kartu ukurannya 16, jadi pakai `blue/700` plus garis bawah biar lolos. Ini beda dari komponen C03 (Link) di `UI-Specs.md`. Kalau disetujui, C03 perlu diupdate.
+1. **Link pakai `blue/700`, bukan `blue/500`.** `DESIGN-SYSTEM.md` bilang teks kecil di atas putih ngga boleh `blue/500` karena kontrasnya cuma 3.6:1. Teks "Daftar" dan "Masuk" di bawah form ukurannya 16, jadi pakai `blue/700` plus garis bawah biar lolos. Ini beda dari komponen C03 (Link) di `UI-Specs.md`. Kalau disetujui, C03 perlu diupdate.
 2. **Varian `error` di Info Card itu baru.** Di `UI-Specs.md` Info Card (C48) cuma satu gaya. Kalau disetujui dipake, tambahin juga ke daftar komponen.
 3. **Helper username.** Di `UI-Specs.md` P02 tertulis "Huruf, angka, dan _ saja". Itu kurang tepat, karena aturan username Django ngebolehin juga `@ . + -`. Di lembar ini udah dibenerin. Kalau mau konsisten, teks di `UI-Specs.md` P02 ikut diubah.
-4. **Tinggi kartu hasil hitungan kasar.** Jangan dikunci. Biarin auto layout (Hug contents) yang nentuin, biar kalau teks error nambah baris frame-nya ikut membesar.
-5. **Padding kartu 32 (desktop) dan 24 (mobile).** Komponen Card umum di design system padding-nya 16. Buat kartu auth dikasih lebih lega karena isinya cuma form, dan angkanya tetap dari skala jarak.
-6. **Teks error dan pesan lain itu target desain.** Di kode sekarang pesan masih bawaan Django (bahasa Indonesia versi Django). Penyesuaian teksnya jadi tugas backend nanti, ngga dikerjain di sini.
-7. **Header tampil menu lengkap** (Perangkat, Diagnosa, Panduan, Suku Cadang) padahal di kode baru ada Perangkat. Itu sengaja, desain jadi targetnya.
+4. **Tinggi Form Wrap hasil hitungan kasar.** Jangan dikunci. Biarin auto layout (Hug contents) yang nentuin, biar kalau teks error nambah baris isinya ikut membesar. Frame desktop tingginya 900, tapi kalau di Daftar isinya lebih panjang dari itu, frame boleh dipanjangin.
+5. **Layout auth khusus, beda dari `UI-Specs.md`.** Di `UI-Specs.md` P01 dan P02 masih berupa kartu di tengah dengan header tetap tampil. Sekarang diganti split-screen tanpa header dan footer (logo di panel ilustrasi jadi jalan keluar ke beranda, plus link "Kembali ke beranda" di desktop). Kalau disetujui, `UI-Specs.md` bagian P01 dan P02 perlu diupdate.
+6. **Buat kode nanti (ditulis manual di VS Code):** layout ini butuh template dasar sendiri yang ngga ikut `base.html`, karena `base.html` selalu masang header dan footer. Cuma template dan CSS, ngga nyentuh view, model, atau URL. Dua halaman tetap di `/accounts/login/` dan `/register/`, dan efek geser desktop bisa dibikin lewat animasi CSS waktu halaman kebuka. Tapi karena nyentuh `core/templates/`, tetap butuh dua approval.
+7. **Ilustrasi disimpen di `docs/brand/`.** Waktu dipake di kode, file SVG-nya dipindah atau disalin ke folder `static` milik `core`.
+8. **Teks error dan pesan lain itu target desain.** Di kode sekarang pesan masih bawaan Django (bahasa Indonesia versi Django). Penyesuaian teksnya jadi tugas backend nanti, ngga dikerjain di sini.
+9. **Header di P05 tampil menu lengkap** (Perangkat, Diagnosa, Panduan, Suku Cadang) padahal di kode baru ada Perangkat. Itu sengaja, desain jadi targetnya.
 
 ---
 
@@ -520,6 +572,7 @@ Semua teks asli (bukan Lorem ipsum) biar gampang disalin ke Figma.
 
 | Lokasi | Teks |
 |---|---|
+| P01 tagline | Masuk dan lanjutin / perbaikanmu. |
 | P01 judul | Masuk ke Sparein |
 | P01 label | Username, Password |
 | P01 tombol | Masuk |
@@ -527,6 +580,11 @@ Semua teks asli (bukan Lorem ipsum) biar gampang disalin ke Figma.
 | P01 teks bawah | Belum punya akun? **Daftar** |
 | P01 Info (dari konten terkunci) | Masuk dulu ya buat lanjut. |
 | P01 Error | Username atau password salah. Coba cek lagi ya. |
+| P02 tagline | Mulai perbaiki / barangmu sendiri. |
+| Motto (P01 dan P02) | Repair first, discard last. |
+| Link kembali (desktop) | Kembali ke beranda |
+| Link mode mobile di P01 | Belum punya akun? **DAFTAR** |
+| Link mode mobile di P02 | Sudah punya akun? **MASUK** |
 | P02 judul | Bikin akun Sparein |
 | P02 subjudul | Gratis. Buka langkah panduan lengkap, harga suku cadang, dan jurnal perbaikan. |
 | P02 label | Username, Password, Ulangi password |
@@ -556,6 +614,9 @@ Semua teks asli (bukan Lorem ipsum) biar gampang disalin ke Figma.
 - [ ] Button, Input, dan Toast punya semua state di tabelnya, terutama `focus` yang kelihatan jelas.
 - [ ] Tombol dan input tingginya minimal 44 di mobile.
 - [ ] Setiap input punya label yang selalu kelihatan.
+- [ ] Layer `Panel Ilustrasi` dan `Panel Form` namanya sama persis di frame Masuk dan Daftar (biar Smart Animate jalan).
+- [ ] Animasi Masuk <-> Daftar udah dicoba di mode Present, desktop dan mobile.
+- [ ] Teks tagline di panel ilustrasi tetap kebaca (kontras lolos 4.5:1 di atas gradasi gelap).
 - [ ] Pesan error ada ikon, ada teks, dan ngga cuma warna merah.
 - [ ] Ikon mata di input password dikasih catatan `aria-label`.
 - [ ] Teks di semua frame udah teks asli sesuai bagian 10.
