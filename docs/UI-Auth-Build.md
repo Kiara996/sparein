@@ -4,7 +4,7 @@ Lembar kerja buat ngegambar halaman autentikasi Sparein di Figma: **Masuk (P01)*
 
 Tinggal ikutin urutan dari atas ke bawah. Semua angka dalam piksel (px).
 
-Mau liat contoh jadinya? Ada mockup SVG delapan frame auth di [`design/auth/`](design/README.md). Tinggal drag ke Figma buat jadi patokan visual. Komponen dan auto layout-nya tetap dibangun manual, SVG ngga bawa itu.
+Mau liat contoh jadinya? Ada mockup SVG 16 frame auth (semuanya) di [`design/auth/`](design/README.md). Tinggal drag ke Figma buat jadi patokan visual. Komponen dan auto layout-nya tetap dibangun manual, SVG ngga bawa itu.
 
 ## Daftar isi
 
